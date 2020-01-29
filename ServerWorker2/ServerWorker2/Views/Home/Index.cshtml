@@ -1,0 +1,90 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
+    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+
+<input type="text" id="user" />
+<input type="text" id="message" />
+<input type="button" value="send" id="send" />
+<input type="button" value="finish work" id="finish" />
+<div id='messages'></div>
+<script type="text/jscript">
+    function DoWork() {
+        var sum = 0;
+        for (var j = 0; j < 3000; j++)
+            for (var i = 0; i < 10000000; i++) { sum++; sum--; }
+    };
+</script>
+
+<script type="text/javascript">
+    var isBusy = "w2 able";
+    var socket,
+        $txt = document.getElementById('message'),
+        $user = document.getElementById('user'),
+        $messages = document.getElementById('messages');
+
+    if (typeof (WebSocket) !== 'undefined') {
+        socket = new WebSocket("ws://localhost:57032/WorkersHandler.ashx");
+    } else {
+        socket = new MozWebSocket("ws://localhost:57032/WorkersHandler.ashx");
+    }
+
+    socket.onmessage = function (msg) {
+        if (msg.data == "status")
+            socket.send(isBusy);
+        else {
+            var $el = document.createElement('p');
+            $el.innerHTML = msg.data;
+            $messages.appendChild($el);
+
+            isBusy = "false";
+            alert("start work");
+            DoWork();
+            alert("end work");
+            socket.send("Worker2 has done his work");
+            isBusy = "w2 able";
+        }
+    };
+
+    socket.onclose = function (event) {
+        alert('Мы потеряли её. Пожалуйста, обновите страницу');
+    };
+
+    document.getElementById('send').onclick = function () {
+        socket.send($user.value + ' : ' + $txt.value);
+        $txt.value = '';
+    };
+    document.getElementById('finish').onclick = function () {
+        alert("start work");
+        DoWork();
+        alert("end work");
+        socket.send("Worker2 has done his work");
+    };
+</script>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Getting started</h2>
+        <p>
+            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
+            enables a clean separation of concerns and gives you full control over markup
+            for enjoyable, agile development.
+        </p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Get more libraries</h2>
+        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Web Hosting</h2>
+        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    </div>
+</div>
